@@ -16,6 +16,7 @@ package syncer
 
 import (
 	"context"
+	repos2 "github.com/drone/drone/store/repos"
 	"runtime/debug"
 	"strings"
 	"time"
@@ -105,6 +106,8 @@ func (s *Synchronizer) Sync(ctx context.Context, user *core.User) (*core.Batch, 
 		}
 		for _, repo := range repos {
 			if strings.Count(repo.Slug, "/") > 1 {
+				repo.Namespace = strings.ReplaceAll(repo.Namespace, "/", repos2.SubgroupDelimiter)
+				remote[repo.UID] = repo
 				if logrus.GetLevel() == logrus.TraceLevel {
 					logger.WithField("namespace", repo.Namespace).
 						WithField("name", repo.Name).

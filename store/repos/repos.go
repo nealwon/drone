@@ -16,10 +16,13 @@ package repos
 
 import (
 	"context"
+	"strings"
 
 	"github.com/drone/drone/core"
 	"github.com/drone/drone/store/shared/db"
 )
+
+const SubgroupDelimiter = "_._"
 
 // New returns a new RepositoryStore.
 func New(db *db.DB) core.RepositoryStore {
@@ -153,6 +156,7 @@ func (s *repoStore) Find(ctx context.Context, id int64) (*core.Repository, error
 }
 
 func (s *repoStore) FindName(ctx context.Context, namespace, name string) (*core.Repository, error) {
+	namespace = strings.ReplaceAll(namespace, SubgroupDelimiter, "/")
 	out := &core.Repository{Slug: namespace + "/" + name}
 	err := s.db.View(func(queryer db.Queryer, binder db.Binder) error {
 		params := ToParams(out)
